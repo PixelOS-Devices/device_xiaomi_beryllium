@@ -193,6 +193,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     android.hardware.keymaster@4.0.vendor
 
+# Keyhandler
+PRODUCT_PACKAGES += \
+    KeyHandler
+
 # Lights
 PRODUCT_PACKAGES += \
     android.hardware.lights-service.beryllium
@@ -240,6 +244,7 @@ PRODUCT_PACKAGES += \
 
 # Overlays
 PRODUCT_PACKAGES += \
+    AOSPBerylliumFrameworksOverlay \
     BerylliumCarrierConfigOverlay \
     BerylliumFaceUnlockOverlay \
     BerylliumFrameworksOverlay \

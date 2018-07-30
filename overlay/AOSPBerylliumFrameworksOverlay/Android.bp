@@ -1,0 +1,11 @@
+//
+// Copyright (C) 2023 PixelOS
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+runtime_resource_overlay {
+    name: "AOSPBerylliumFrameworksOverlay",
+    sdk_version: "current",
+    vendor: true,
+}
