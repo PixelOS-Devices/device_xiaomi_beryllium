@@ -298,7 +298,7 @@ PRODUCT_COPY_FILES += \
 # Power
 PRODUCT_PACKAGES += \
     android.hardware.power-service.beryllium-libperfmgr \
-    android.hardware.power.stats@1.0-service.pixel \
+    android.hardware.power.stats@1.0-service.xiaomi \
     android.hardware.power@1.2.vendor
 
 PRODUCT_COPY_FILES += \
