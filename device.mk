@@ -372,6 +372,19 @@ PRODUCT_PACKAGES += \
 PRODUCT_BOOT_JARS += \
     telephony-ext
 
+# Thermal HAL
+PRODUCT_PACKAGES += \
+    android.hardware.thermal@2.0-service.pixel \
+
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/configs/thermal/thermal_info_config_qcom.json:$(TARGET_COPY_OUT_VENDOR)/etc/thermal_info_config.json
+
+# Thermal-engine
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/configs/thermal/thermal-engine-qcom-novr-prod.conf:$(TARGET_COPY_OUT_VENDOR)/etc/thermal-engine-qcom-novr-prod.conf \
+    $(LOCAL_PATH)/configs/thermal/thermal-engine-qcom-gaming-prod.conf:$(TARGET_COPY_OUT_VENDOR)/etc/thermal-engine-qcom-gaming-prod.conf \
+    $(LOCAL_PATH)/configs/thermal/thermal-engine-qcom-vr-prod.conf:$(TARGET_COPY_OUT_VENDOR)/etc/thermal-engine-qcom-vr-prod.conf
+
 # Treble
 PRODUCT_USE_VNDK_OVERRIDE := true
 
