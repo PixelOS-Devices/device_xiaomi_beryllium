@@ -296,7 +296,8 @@ PRODUCT_COPY_FILES += \
 
 # Power
 PRODUCT_PACKAGES += \
-    android.hardware.power@1.3-service.beryllium-libperfmgr
+    android.hardware.power-service.beryllium-libperfmgr \
+    android.hardware.power@1.2.vendor
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/power/configs/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json
@@ -352,7 +353,9 @@ $(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)
 
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += \
-    $(LOCAL_PATH) 
+    $(LOCAL_PATH) \
+    hardware/google/interfaces \
+    hardware/google/pixel 
 
 # Telephony
 PRODUCT_PACKAGES += \
