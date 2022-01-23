@@ -26,6 +26,22 @@
 
 #include "fingerprint.h"
 
+namespace aidl {
+namespace google {
+namespace hardware {
+namespace power {
+namespace extension {
+namespace pixel {
+
+class IPowerExt;
+
+} // namespace pixel
+} // namespace extension
+} // namespace power
+} // namespace hardware
+} // namespace google
+} // namespace aidl
+
 namespace android {
 namespace hardware {
 namespace biometrics {
@@ -68,6 +84,11 @@ struct BiometricsFingerprint : public IBiometricsFingerprint {
 
   private:
     static fingerprint_device_t* openHal();
+    int32_t connectPowerHalExt();
+    int32_t checkPowerHalExtBoostSupport(const std::string &boost);
+    int32_t sendPowerHalExtBoost(const std::string &boost, int32_t durationMs);
+    int32_t isBoostHintSupported();
+    int32_t sendAuthenticatedBoostHint();
     static void notify(
         const fingerprint_msg_t* msg); /* Static callback for legacy HAL implementation */
     static Return<RequestStatus> ErrorFilter(int32_t error);
@@ -83,6 +104,10 @@ struct BiometricsFingerprint : public IBiometricsFingerprint {
     Return<bool> isUdfps(uint32_t sensorId) override;
     Return<void> onFingerDown(uint32_t x, uint32_t y, float minor, float major) override;
     Return<void> onFingerUp() override;
+
+    bool mBoostHintIsSupported;
+    bool mBoostHintSupportIsChecked;
+    std::shared_ptr<aidl::google::hardware::power::extension::pixel::IPowerExt> mPowerHalExtAidl;
 };
 
 }  // namespace implementation
