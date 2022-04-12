@@ -361,6 +361,7 @@ $(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += \
     $(LOCAL_PATH) \
+    vendor/qcom/opensource/usb/etc \
     hardware/google/interfaces \
     hardware/google/pixel 
 
@@ -399,9 +400,7 @@ PRODUCT_PACKAGES += \
 
 # USB
 PRODUCT_PACKAGES += \
-    android.hardware.usb.gadget@1.1 \
-    android.hardware.usb.gadget@1.1.vendor \
-    android.hardware.usb@1.0-service 
+    android.hardware.usb@1.0-service
 
 # Vibrator
 PRODUCT_PACKAGES += \
