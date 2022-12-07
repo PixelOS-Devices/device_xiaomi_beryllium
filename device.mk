@@ -252,7 +252,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     AOSPBerylliumFrameworksOverlay \
     BerylliumCarrierConfigOverlay \
-    BerylliumFaceUnlockOverlay \
     BerylliumFrameworksOverlay \
     BerylliumNoCutoutOverlay \
     BerylliumSettingsOverlay \

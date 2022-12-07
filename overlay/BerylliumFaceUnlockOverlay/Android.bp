@@ -1,5 +1,0 @@
-runtime_resource_overlay {
-    name: "BerylliumFaceUnlockOverlay",
-    resource_dirs: ["res"],
-    product_specific: true,
-}
