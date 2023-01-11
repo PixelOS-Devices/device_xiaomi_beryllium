@@ -8,6 +8,7 @@ $(call inherit-product, device/xiaomi/beryllium/device.mk)
 
 # Inherit some common Arrow stuff.
 $(call inherit-product, vendor/arrow/config/common.mk)
+TARGET_BOOT_ANIMATION_RES := 1080
 
 # Device identifier. This must come after all inclusions.
 PRODUCT_NAME := arrow_beryllium
@@ -25,6 +26,9 @@ PRODUCT_BUILD_PROP_OVERRIDES += \
     TARGET_PRODUCT="beryllium"
 
 PRODUCT_GMS_CLIENTID_BASE := android-xiaomi
+
+# ArrowOS additions
+DEVICE_MAINTAINER := Sourav (resist15)
 
 # Face Unlock
 TARGET_FACE_UNLOCK_SUPPORTED := true
