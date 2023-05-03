@@ -37,7 +37,7 @@ namespace hardware {
 namespace vibrator {
 
 class InputFFDevice {
-public:
+  public:
     InputFFDevice();
     int playEffect(int effectId, EffectStrength es, long *playLengthMs);
     int on(int32_t timeoutMs);
@@ -47,7 +47,8 @@ public:
     bool mSupportEffects;
     bool mSupportExternalControl;
     bool mInExternalControl;
-private:
+
+  private:
     int play(int effectId, uint32_t timeoutMs, long *playLengthMs);
     int mVibraFd;
     int16_t mCurrAppId;
@@ -55,38 +56,39 @@ private:
 };
 
 class LedVibratorDevice {
-public:
+  public:
     LedVibratorDevice();
     int on(int32_t timeoutMs);
     int off();
     int playEffect(Effect effect, long *playLengthMs);
     bool mDetected;
-private:
+
+  private:
     int write_value(const char *file, const char *value);
 };
 
 class Vibrator : public BnVibrator {
-public:
+  public:
     class InputFFDevice ff;
     class LedVibratorDevice ledVib;
-    ndk::ScopedAStatus getCapabilities(int32_t* _aidl_return) override;
+    ndk::ScopedAStatus getCapabilities(int32_t *_aidl_return) override;
     ndk::ScopedAStatus off() override;
     ndk::ScopedAStatus on(int32_t timeoutMs,
-            const std::shared_ptr<IVibratorCallback>& callback) override;
+                          const std::shared_ptr<IVibratorCallback> &callback) override;
     ndk::ScopedAStatus perform(Effect effect, EffectStrength strength,
-            const std::shared_ptr<IVibratorCallback>& callback,
-            int32_t* _aidl_return) override;
-    ndk::ScopedAStatus getSupportedEffects(std::vector<Effect>* _aidl_return) override;
+                               const std::shared_ptr<IVibratorCallback> &callback,
+                               int32_t *_aidl_return) override;
+    ndk::ScopedAStatus getSupportedEffects(std::vector<Effect> *_aidl_return) override;
     ndk::ScopedAStatus setAmplitude(float amplitude) override;
     ndk::ScopedAStatus setExternalControl(bool enabled) override;
-    ndk::ScopedAStatus getCompositionDelayMax(int32_t* maxDelayMs);
-    ndk::ScopedAStatus getCompositionSizeMax(int32_t* maxSize);
-    ndk::ScopedAStatus getSupportedPrimitives(std::vector<CompositePrimitive>* supported) override;
+    ndk::ScopedAStatus getCompositionDelayMax(int32_t *maxDelayMs);
+    ndk::ScopedAStatus getCompositionSizeMax(int32_t *maxSize);
+    ndk::ScopedAStatus getSupportedPrimitives(std::vector<CompositePrimitive> *supported) override;
     ndk::ScopedAStatus getPrimitiveDuration(CompositePrimitive primitive,
-                                            int32_t* durationMs) override;
-    ndk::ScopedAStatus compose(const std::vector<CompositeEffect>& composite,
-                               const std::shared_ptr<IVibratorCallback>& callback) override;
-    ndk::ScopedAStatus getSupportedAlwaysOnEffects(std::vector<Effect>* _aidl_return) override;
+                                            int32_t *durationMs) override;
+    ndk::ScopedAStatus compose(const std::vector<CompositeEffect> &composite,
+                               const std::shared_ptr<IVibratorCallback> &callback) override;
+    ndk::ScopedAStatus getSupportedAlwaysOnEffects(std::vector<Effect> *_aidl_return) override;
     ndk::ScopedAStatus alwaysOnEnable(int32_t id, Effect effect, EffectStrength strength) override;
     ndk::ScopedAStatus alwaysOnDisable(int32_t id) override;
 };

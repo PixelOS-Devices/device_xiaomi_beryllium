@@ -76,7 +76,7 @@ class PowerHintSession : public BnPowerHintSession {
     ndk::ScopedAStatus resume() override;
     ndk::ScopedAStatus updateTargetWorkDuration(int64_t targetDurationNanos) override;
     ndk::ScopedAStatus reportActualWorkDuration(
-            const std::vector<WorkDuration> &actualDurations) override;
+        const std::vector<WorkDuration> &actualDurations) override;
     bool isActive();
     bool isTimeout();
     void wakeup();

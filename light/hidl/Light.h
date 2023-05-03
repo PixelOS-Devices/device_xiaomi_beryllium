@@ -21,8 +21,9 @@
 #include <android/hardware/light/2.0/ILight.h>
 #include <hardware/lights.h>
 #include <hidl/Status.h>
-#include <unordered_map>
+
 #include <mutex>
+#include <unordered_map>
 
 namespace android {
 namespace hardware {
@@ -30,9 +31,9 @@ namespace light {
 namespace V2_0 {
 namespace implementation {
 
+using ::android::hardware::hidl_vec;
 using ::android::hardware::Return;
 using ::android::hardware::Void;
-using ::android::hardware::hidl_vec;
 using ::android::hardware::light::V2_0::ILight;
 using ::android::hardware::light::V2_0::LightState;
 using ::android::hardware::light::V2_0::Status;
@@ -42,15 +43,15 @@ class Light : public ILight {
   public:
     Light();
 
-    Return<Status> setLight(Type type, const LightState& state) override;
+    Return<Status> setLight(Type type, const LightState &state) override;
     Return<void> getSupportedTypes(getSupportedTypes_cb _hidl_cb) override;
 
   private:
-    void handleBattery(const LightState& state);
-    void handleNotification(const LightState& state, size_t index);
+    void handleBattery(const LightState &state);
+    void handleNotification(const LightState &state, size_t index);
 
     std::mutex mLock;
-    std::unordered_map<Type, std::function<void(const LightState&)>> mLights;
+    std::unordered_map<Type, std::function<void(const LightState &)>> mLights;
     std::array<LightState, 2> mLightStates;
 };
 

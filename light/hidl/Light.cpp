@@ -21,6 +21,7 @@
 
 #include <android-base/logging.h>
 #include <android-base/stringprintf.h>
+
 #include <fstream>
 
 namespace android {
@@ -33,7 +34,7 @@ namespace implementation {
  * Write value to path and close file.
  */
 template <typename T>
-static void set(const std::string& path, const T& value) {
+static void set(const std::string &path, const T &value) {
     std::ofstream file(path);
     file << value;
 }
@@ -41,12 +42,15 @@ static void set(const std::string& path, const T& value) {
 static constexpr uint32_t kBrightnessNoBlink = 5;
 
 Light::Light() {
-    mLights.emplace(Type::ATTENTION, std::bind(&Light::handleNotification, this, std::placeholders::_1, 0));
-    mLights.emplace(Type::NOTIFICATIONS, std::bind(&Light::handleNotification, this, std::placeholders::_1, 1));
-    mLights.emplace(Type::BATTERY, std::bind(&Light::handleNotification, this, std::placeholders::_1, 2));
+    mLights.emplace(Type::ATTENTION,
+                    std::bind(&Light::handleNotification, this, std::placeholders::_1, 0));
+    mLights.emplace(Type::NOTIFICATIONS,
+                    std::bind(&Light::handleNotification, this, std::placeholders::_1, 1));
+    mLights.emplace(Type::BATTERY,
+                    std::bind(&Light::handleNotification, this, std::placeholders::_1, 2));
 }
 
-void Light::handleBattery(const LightState& state) {
+void Light::handleBattery(const LightState &state) {
     uint32_t whiteBrightness = getBrightness(state);
 
     uint32_t onMs = state.flashMode == Flash::TIMED ? state.flashOnMs : 0;
@@ -62,7 +66,7 @@ void Light::handleBattery(const LightState& state) {
                 output += "0";
             } else {
                 output += std::to_string((i - kRampSteps / 2) * 100 * brightness /
-                                         (kDefaultMaxBrightness * (kRampSteps/2)));
+                                         (kDefaultMaxBrightness * (kRampSteps / 2)));
             }
         }
         return output;
@@ -94,12 +98,12 @@ void Light::handleBattery(const LightState& state) {
     }
 }
 
-void Light::handleNotification(const LightState& state, size_t index) {
+void Light::handleNotification(const LightState &state, size_t index) {
     mLightStates.at(index) = state;
 
     uint32_t whiteBrightness = 0;
     LightState stateToUse = mLightStates.front();
-    for (const auto& lightState : mLightStates) {
+    for (const auto &lightState : mLightStates) {
         if (lightState.color & 0xffffff) {
             stateToUse = lightState;
             whiteBrightness = kBrightnessNoBlink;
@@ -121,7 +125,7 @@ void Light::handleNotification(const LightState& state, size_t index) {
     }
 }
 
-Return<Status> Light::setLight(Type type, const LightState& state) {
+Return<Status> Light::setLight(Type type, const LightState &state) {
     auto it = mLights.find(type);
 
     if (it == mLights.end()) {
@@ -139,7 +143,7 @@ Return<Status> Light::setLight(Type type, const LightState& state) {
 Return<void> Light::getSupportedTypes(getSupportedTypes_cb _hidl_cb) {
     std::vector<Type> types;
 
-    for (auto const& light : mLights) {
+    for (auto const &light : mLights) {
         types.push_back(light.first);
     }
 

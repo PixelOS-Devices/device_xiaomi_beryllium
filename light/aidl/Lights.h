@@ -20,6 +20,7 @@
 #include <aidl/android/hardware/light/BnLights.h>
 #include <hardware/hardware.h>
 #include <hardware/lights.h>
+
 #include <map>
 
 namespace aidl {
@@ -28,18 +29,18 @@ namespace hardware {
 namespace light {
 
 class Lights : public BnLights {
-    public:
-      Lights();
-      ndk::ScopedAStatus setLightState(int id, const HwLightState& state) override;
-      ndk::ScopedAStatus getLights(std::vector<HwLight>* types) override;
+  public:
+    Lights();
+    ndk::ScopedAStatus setLightState(int id, const HwLightState &state) override;
+    ndk::ScopedAStatus getLights(std::vector<HwLight> *types) override;
 
-    private:
-      std::mutex mLock;
-      // a map of <id, priority>
-      std::map<int, int> mLights;
-      std::vector<HwLight> mAvailableLights;
-      // HwLightState in the order of priority
-      std::array<HwLightState, 3> mHwLightStates;
+  private:
+    std::mutex mLock;
+    // a map of <id, priority>
+    std::map<int, int> mLights;
+    std::vector<HwLight> mAvailableLights;
+    // HwLightState in the order of priority
+    std::array<HwLightState, 3> mHwLightStates;
 };
 
 }  // namespace light

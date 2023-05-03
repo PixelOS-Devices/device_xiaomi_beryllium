@@ -42,7 +42,7 @@ using ::aidl::google::hardware::power::impl::pixel::PowerHintSession;
 using ::android::perfmgr::HintManager;
 
 #ifdef MODE_EXT
-extern bool isDeviceSpecificModeSupported(Mode type, bool* _aidl_return);
+extern bool isDeviceSpecificModeSupported(Mode type, bool *_aidl_return);
 extern bool setDeviceSpecificMode(Mode type, bool enabled);
 #endif
 
@@ -50,9 +50,7 @@ constexpr char kPowerHalStateProp[] = "vendor.powerhal.state";
 constexpr char kPowerHalAudioProp[] = "vendor.powerhal.audio";
 constexpr char kPowerHalRenderingProp[] = "vendor.powerhal.rendering";
 
-Power::Power()
-    : mInteractionHandler(nullptr),
-      mSustainedPerfModeOn(false) {
+Power::Power() : mInteractionHandler(nullptr), mSustainedPerfModeOn(false) {
     mInteractionHandler = std::make_unique<InteractionHandler>();
     mInteractionHandler->Init();
 
@@ -202,10 +200,9 @@ constexpr const char *boolToString(bool b) {
 
 binder_status_t Power::dump(int fd, const char **, uint32_t) {
     std::string buf(::android::base::StringPrintf(
-            "HintManager Running: %s\n"
-            "SustainedPerformanceMode: %s\n",
-            boolToString(HintManager::GetInstance()->IsRunning()),
-            boolToString(mSustainedPerfModeOn)));
+        "HintManager Running: %s\n"
+        "SustainedPerformanceMode: %s\n",
+        boolToString(HintManager::GetInstance()->IsRunning()), boolToString(mSustainedPerfModeOn)));
     // Dump nodes through libperfmgr
     HintManager::GetInstance()->DumpToFd(fd);
     PowerSessionManager::getInstance()->dumpToFd(fd);
@@ -230,16 +227,16 @@ ndk::ScopedAStatus Power::createHintSession(int32_t tgid, int32_t uid,
         *_aidl_return = nullptr;
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
-    std::shared_ptr<IPowerHintSession> session = ndk::SharedRefBase::make<PowerHintSession>(
-            tgid, uid, threadIds, durationNanos);
+    std::shared_ptr<IPowerHintSession> session =
+        ndk::SharedRefBase::make<PowerHintSession>(tgid, uid, threadIds, durationNanos);
     *_aidl_return = session;
     return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus Power::getHintSessionPreferredRate(int64_t *outNanoseconds) {
     *outNanoseconds = HintManager::GetInstance()->GetAdpfProfile()
-                              ? HintManager::GetInstance()->GetAdpfProfile()->mReportingRateLimitNs
-                              : 0;
+                          ? HintManager::GetInstance()->GetAdpfProfile()->mReportingRateLimitNs
+                          : 0;
     if (*outNanoseconds <= 0) {
         return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
     }

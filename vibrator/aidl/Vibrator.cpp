@@ -29,6 +29,8 @@
 
 #define LOG_TAG "vendor.qti.vibrator"
 
+#include "include/Vibrator.h"
+
 #include <cutils/properties.h>
 #include <dirent.h>
 #include <inttypes.h>
@@ -36,9 +38,8 @@
 #include <log/log.h>
 #include <string.h>
 #include <sys/ioctl.h>
-#include <thread>
 
-#include "include/Vibrator.h"
+#include <thread>
 #ifdef USE_EFFECT_STREAM
 #include "effect.h"
 #endif
@@ -48,37 +49,37 @@ namespace android {
 namespace hardware {
 namespace vibrator {
 
-#define STRONG_MAGNITUDE        0x7fff
-#define MEDIUM_MAGNITUDE        0x5fff
-#define LIGHT_MAGNITUDE         0x3fff
-#define INVALID_VALUE           -1
-#define CUSTOM_DATA_LEN         3
-#define NAME_BUF_SIZE           32
+#define STRONG_MAGNITUDE 0x7fff
+#define MEDIUM_MAGNITUDE 0x5fff
+#define LIGHT_MAGNITUDE 0x3fff
+#define INVALID_VALUE -1
+#define CUSTOM_DATA_LEN 3
+#define NAME_BUF_SIZE 32
 
-#define MSM_CPU_LAHAINA         415
-#define APQ_CPU_LAHAINA         439
-#define MSM_CPU_SHIMA           450
-#define MSM_CPU_SM8325          501
-#define APQ_CPU_SM8325P         502
-#define MSM_CPU_YUPIK           475
+#define MSM_CPU_LAHAINA 415
+#define APQ_CPU_LAHAINA 439
+#define MSM_CPU_SHIMA 450
+#define MSM_CPU_SM8325 501
+#define APQ_CPU_SM8325P 502
+#define MSM_CPU_YUPIK 475
 
-#define test_bit(bit, array)    ((array)[(bit)/8] & (1<<((bit)%8)))
+#define test_bit(bit, array) ((array)[(bit) / 8] & (1 << ((bit) % 8)))
 
 // all Xiaomi SDM845 vibrators have 4878 as WAVE_PLAY_RATE_US
-#define WAVE_PLAY_RATE_US       4878
+#define WAVE_PLAY_RATE_US 4878
 // from LED based QPNP Haptics driver
-#define HAP_WAVE_SAMP_LEN       8
+#define HAP_WAVE_SAMP_LEN 8
 // sleep duration for double click
-#define DOUBLE_CLICK_SLEEP_MS   100
+#define DOUBLE_CLICK_SLEEP_MS 100
 
 // based on get_play_length() function from upstream qti-haptics driver
 static const long dummyPlayMs = WAVE_PLAY_RATE_US * HAP_WAVE_SAMP_LEN / 1000;
-static const long dummyDoubleClickPlayMs = WAVE_PLAY_RATE_US * HAP_WAVE_SAMP_LEN / 1000 * 2 + DOUBLE_CLICK_SLEEP_MS;
+static const long dummyDoubleClickPlayMs =
+    WAVE_PLAY_RATE_US * HAP_WAVE_SAMP_LEN / 1000 * 2 + DOUBLE_CLICK_SLEEP_MS;
 
 static const char LED_DEVICE[] = "/sys/class/leds/vibrator";
 
-InputFFDevice::InputFFDevice()
-{
+InputFFDevice::InputFFDevice() {
     DIR *dp;
     FILE *fp = NULL;
     struct dirent *dir;
@@ -104,10 +105,9 @@ InputFFDevice::InputFFDevice()
     }
 
     memset(ffBitmask, 0, sizeof(ffBitmask));
-    while ((dir = readdir(dp)) != NULL){
+    while ((dir = readdir(dp)) != NULL) {
         if (dir->d_name[0] == '.' &&
-            (dir->d_name[1] == '\0' ||
-             (dir->d_name[1] == '.' && dir->d_name[2] == '\0')))
+            (dir->d_name[1] == '\0' || (dir->d_name[1] == '.' && dir->d_name[2] == '\0')))
             continue;
 
         snprintf(devicename, PATH_MAX, "%s%s", INPUT_DIR, dir->d_name);
@@ -138,8 +138,7 @@ InputFFDevice::InputFFDevice()
             continue;
         }
 
-        if (test_bit(FF_CONSTANT, ffBitmask) ||
-                test_bit(FF_PERIODIC, ffBitmask)) {
+        if (test_bit(FF_CONSTANT, ffBitmask) || test_bit(FF_PERIODIC, ffBitmask)) {
             mVibraFd = fd;
             if (test_bit(FF_CUSTOM, ffBitmask))
                 mSupportEffects = true;
@@ -151,17 +150,17 @@ InputFFDevice::InputFFDevice()
                 fclose(fp);
             }
             switch (soc) {
-            case MSM_CPU_LAHAINA:
-            case APQ_CPU_LAHAINA:
-            case MSM_CPU_SHIMA:
-            case MSM_CPU_SM8325:
-            case APQ_CPU_SM8325P:
-            case MSM_CPU_YUPIK:
-                mSupportExternalControl = true;
-                break;
-            default:
-                mSupportExternalControl = false;
-                break;
+                case MSM_CPU_LAHAINA:
+                case APQ_CPU_LAHAINA:
+                case MSM_CPU_SHIMA:
+                case MSM_CPU_SM8325:
+                case APQ_CPU_SM8325P:
+                case MSM_CPU_YUPIK:
+                    mSupportExternalControl = true;
+                    break;
+                default:
+                    mSupportExternalControl = false;
+                    break;
             }
             break;
         }
@@ -203,7 +202,7 @@ int InputFFDevice::play(int effectId, uint32_t timeoutMs, long *playLengthMs) {
     if (mVibraFd == INVALID_VALUE) {
         if (playLengthMs != NULL)
             *playLengthMs = 0;
-            return 0;
+        return 0;
     }
 
     if (timeoutMs != 0) {
@@ -260,7 +259,7 @@ int InputFFDevice::play(int effectId, uint32_t timeoutMs, long *playLengthMs) {
         play.code = mCurrAppId;
         play.time.tv_sec = 0;
         play.time.tv_usec = 0;
-        ret = TEMP_FAILURE_RETRY(write(mVibraFd, (const void*)&play, sizeof(play)));
+        ret = TEMP_FAILURE_RETRY(write(mVibraFd, (const void *)&play, sizeof(play)));
         if (ret == -1) {
             ALOGE("write failed, errno = %d\n", -errno);
             ret = TEMP_FAILURE_RETRY(ioctl(mVibraFd, EVIOCRMFF, mCurrAppId));
@@ -317,17 +316,17 @@ int InputFFDevice::setAmplitude(uint8_t amplitude) {
 
 int InputFFDevice::playEffect(int effectId, EffectStrength es, long *playLengthMs) {
     switch (es) {
-    case EffectStrength::LIGHT:
-        mCurrMagnitude = LIGHT_MAGNITUDE;
-        break;
-    case EffectStrength::MEDIUM:
-        mCurrMagnitude = MEDIUM_MAGNITUDE;
-        break;
-    case EffectStrength::STRONG:
-        mCurrMagnitude = STRONG_MAGNITUDE;
-        break;
-    default:
-        return -1;
+        case EffectStrength::LIGHT:
+            mCurrMagnitude = LIGHT_MAGNITUDE;
+            break;
+        case EffectStrength::MEDIUM:
+            mCurrMagnitude = MEDIUM_MAGNITUDE;
+            break;
+        case EffectStrength::STRONG:
+            mCurrMagnitude = STRONG_MAGNITUDE;
+            break;
+        default:
+            return -1;
     }
 
     return play(effectId, INVALID_VALUE, playLengthMs);
@@ -386,18 +385,18 @@ int LedVibratorDevice::on(int32_t timeoutMs) {
     snprintf(file, sizeof(file), "%s/%s", LED_DEVICE, "state");
     ret = write_value(file, "1");
     if (ret < 0)
-       goto error;
+        goto error;
 
     snprintf(file, sizeof(file), "%s/%s", LED_DEVICE, "duration");
     snprintf(value, sizeof(value), "%u\n", timeoutMs);
     ret = write_value(file, value);
     if (ret < 0)
-       goto error;
+        goto error;
 
     snprintf(file, sizeof(file), "%s/%s", LED_DEVICE, "activate");
     ret = write_value(file, "1");
     if (ret < 0)
-       goto error;
+        goto error;
 
     return 0;
 
@@ -406,8 +405,7 @@ error:
     return ret;
 }
 
-int LedVibratorDevice::off()
-{
+int LedVibratorDevice::off() {
     char file[PATH_MAX];
     int ret;
 
@@ -423,7 +421,8 @@ int LedVibratorDevice::playEffect(Effect effect, long *playLengthMs) {
     *playLengthMs = dummyPlayMs;
 
     // QPNP haptics driver calculates the index as timeoutMs / 5
-    if (effect == Effect::CLICK || effect == Effect::DOUBLE_CLICK || effect == Effect::THUD || effect == Effect::POP) {
+    if (effect == Effect::CLICK || effect == Effect::DOUBLE_CLICK || effect == Effect::THUD ||
+        effect == Effect::POP) {
         timeoutMs = 6;
     } else if (effect == Effect::TICK) {
         timeoutMs = 1;
@@ -441,7 +440,7 @@ int LedVibratorDevice::playEffect(Effect effect, long *playLengthMs) {
     return on(timeoutMs);
 }
 
-ndk::ScopedAStatus Vibrator::getCapabilities(int32_t* _aidl_return) {
+ndk::ScopedAStatus Vibrator::getCapabilities(int32_t *_aidl_return) {
     *_aidl_return = IVibrator::CAP_ON_CALLBACK;
 
     if (ledVib.mDetected) {
@@ -476,7 +475,7 @@ ndk::ScopedAStatus Vibrator::off() {
 }
 
 ndk::ScopedAStatus Vibrator::on(int32_t timeoutMs,
-                                const std::shared_ptr<IVibratorCallback>& callback) {
+                                const std::shared_ptr<IVibratorCallback> &callback) {
     int ret;
 
     ALOGD("Vibrator on for timeoutMs: %d", timeoutMs);
@@ -502,14 +501,15 @@ ndk::ScopedAStatus Vibrator::on(int32_t timeoutMs,
     return ndk::ScopedAStatus::ok();
 }
 
-ndk::ScopedAStatus Vibrator::perform(Effect effect, EffectStrength es, const std::shared_ptr<IVibratorCallback>& callback, int32_t* _aidl_return) {
+ndk::ScopedAStatus Vibrator::perform(Effect effect, EffectStrength es,
+                                     const std::shared_ptr<IVibratorCallback> &callback,
+                                     int32_t *_aidl_return) {
     long playLengthMs;
     int ret;
 
     ALOGD("Vibrator perform effect %d", effect);
 
-    if (effect < Effect::CLICK ||
-            effect > Effect::HEAVY_CLICK)
+    if (effect < Effect::CLICK || effect > Effect::HEAVY_CLICK)
         return ndk::ScopedAStatus(AStatus_fromExceptionCode(EX_UNSUPPORTED_OPERATION));
 
     if (es != EffectStrength::LIGHT && es != EffectStrength::MEDIUM && es != EffectStrength::STRONG)
@@ -537,9 +537,9 @@ ndk::ScopedAStatus Vibrator::perform(Effect effect, EffectStrength es, const std
     return ndk::ScopedAStatus::ok();
 }
 
-ndk::ScopedAStatus Vibrator::getSupportedEffects(std::vector<Effect>* _aidl_return) {
-    *_aidl_return = {Effect::CLICK, Effect::DOUBLE_CLICK, Effect::TICK, Effect::THUD,
-                     Effect::POP, Effect::HEAVY_CLICK};
+ndk::ScopedAStatus Vibrator::getSupportedEffects(std::vector<Effect> *_aidl_return) {
+    *_aidl_return = {Effect::CLICK, Effect::DOUBLE_CLICK, Effect::TICK,
+                     Effect::THUD,  Effect::POP,          Effect::HEAVY_CLICK};
 
     return ndk::ScopedAStatus::ok();
 }
@@ -579,29 +579,30 @@ ndk::ScopedAStatus Vibrator::setExternalControl(bool enabled) {
     return ndk::ScopedAStatus::ok();
 }
 
-ndk::ScopedAStatus Vibrator::getCompositionDelayMax(int32_t* maxDelayMs  __unused) {
+ndk::ScopedAStatus Vibrator::getCompositionDelayMax(int32_t *maxDelayMs __unused) {
     return ndk::ScopedAStatus(AStatus_fromExceptionCode(EX_UNSUPPORTED_OPERATION));
 }
 
-ndk::ScopedAStatus Vibrator::getCompositionSizeMax(int32_t* maxSize __unused) {
+ndk::ScopedAStatus Vibrator::getCompositionSizeMax(int32_t *maxSize __unused) {
     return ndk::ScopedAStatus(AStatus_fromExceptionCode(EX_UNSUPPORTED_OPERATION));
 }
 
-ndk::ScopedAStatus Vibrator::getSupportedPrimitives(std::vector<CompositePrimitive>* supported __unused) {
+ndk::ScopedAStatus Vibrator::getSupportedPrimitives(
+    std::vector<CompositePrimitive> *supported __unused) {
     return ndk::ScopedAStatus(AStatus_fromExceptionCode(EX_UNSUPPORTED_OPERATION));
 }
 
 ndk::ScopedAStatus Vibrator::getPrimitiveDuration(CompositePrimitive primitive __unused,
-                                                  int32_t* durationMs __unused) {
+                                                  int32_t *durationMs __unused) {
     return ndk::ScopedAStatus(AStatus_fromExceptionCode(EX_UNSUPPORTED_OPERATION));
 }
 
-ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect>& composite __unused,
-                                     const std::shared_ptr<IVibratorCallback>& callback __unused) {
+ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composite __unused,
+                                     const std::shared_ptr<IVibratorCallback> &callback __unused) {
     return ndk::ScopedAStatus(AStatus_fromExceptionCode(EX_UNSUPPORTED_OPERATION));
 }
 
-ndk::ScopedAStatus Vibrator::getSupportedAlwaysOnEffects(std::vector<Effect>* _aidl_return __unused) {
+ndk::ScopedAStatus Vibrator::getSupportedAlwaysOnEffects(std::vector<Effect> *_aidl_return __unused) {
     return ndk::ScopedAStatus(AStatus_fromExceptionCode(EX_UNSUPPORTED_OPERATION));
 }
 
@@ -618,4 +619,3 @@ ndk::ScopedAStatus Vibrator::alwaysOnDisable(int32_t id __unused) {
 }  // namespace hardware
 }  // namespace android
 }  // namespace aidl
-

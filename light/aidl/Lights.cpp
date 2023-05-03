@@ -18,8 +18,10 @@
 #define LOG_TAG "android.hardware.lights-service.beryllium"
 
 #include "Lights.h"
-#include <log/log.h>
+
 #include <android-base/logging.h>
+#include <log/log.h>
+
 #include <fstream>
 
 namespace aidl {
@@ -31,19 +33,17 @@ namespace light {
  * Write value to path and close file.
  */
 template <typename T>
-static void set(const std::string& path, const T& value) {
+static void set(const std::string &path, const T &value) {
     std::ofstream file(path);
     file << value;
 }
 
 static constexpr uint32_t kBrightnessNoBlink = 90;
 
-const static std::map<LightType, int> kSupportedLights = {
-    {LightType::BACKLIGHT, 3},
-    {LightType::BATTERY, 2},
-    {LightType::NOTIFICATIONS, 1},
-    {LightType::ATTENTION, 0}
-};
+const static std::map<LightType, int> kSupportedLights = {{LightType::BACKLIGHT, 3},
+                                                          {LightType::BATTERY, 2},
+                                                          {LightType::NOTIFICATIONS, 1},
+                                                          {LightType::ATTENTION, 0}};
 
 Lights::Lights() {
     // int lightCount = 0;
@@ -59,7 +59,7 @@ Lights::Lights() {
     }
 }
 
-ndk::ScopedAStatus Lights::setLightState(int id, const HwLightState& state) {
+ndk::ScopedAStatus Lights::setLightState(int id, const HwLightState &state) {
     ALOGI("setLightState id=%d", id);
     auto it = mLights.find(id);
     if (it == mLights.end()) {
@@ -77,7 +77,7 @@ ndk::ScopedAStatus Lights::setLightState(int id, const HwLightState& state) {
     uint32_t whiteBrightness = 0;
     // choose HwLightState in the order of priority
     HwLightState stateToUse = mHwLightStates.front();
-    for (const auto& itState : mHwLightStates) {
+    for (const auto &itState : mHwLightStates) {
         if (itState.color & 0xffffff) {
             stateToUse = itState;
             whiteBrightness = kBrightnessNoBlink;
@@ -101,7 +101,7 @@ ndk::ScopedAStatus Lights::setLightState(int id, const HwLightState& state) {
     return ndk::ScopedAStatus::ok();
 }
 
-ndk::ScopedAStatus Lights::getLights(std::vector<HwLight>* lights) {
+ndk::ScopedAStatus Lights::getLights(std::vector<HwLight> *lights) {
     for (auto i = mAvailableLights.begin(); i != mAvailableLights.end(); i++) {
         lights->push_back(*i);
     }

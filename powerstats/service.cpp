@@ -22,7 +22,6 @@
 #include <binder/IServiceManager.h>
 #include <binder/ProcessState.h>
 #include <hidl/HidlTransportSupport.h>
-
 #include <pixelpowerstats/AidlStateResidencyDataProvider.h>
 #include <pixelpowerstats/GenericStateResidencyDataProvider.h>
 #include <pixelpowerstats/PowerStats.h>

@@ -44,7 +44,7 @@
 /* Boyer-Moore string search implementation from Wikipedia */
 
 /* Return longest suffix length of suffix ending at str[p] */
-static int max_suffix_len(const char* str, size_t str_len, size_t p) {
+static int max_suffix_len(const char *str, size_t str_len, size_t p) {
     uint32_t i;
 
     for (i = 0; (str[p - i] == str[str_len - 1 - i]) && (i < p);) {
@@ -57,7 +57,7 @@ static int max_suffix_len(const char* str, size_t str_len, size_t p) {
 /* Generate table of distance between last character of pat and rightmost
  * occurrence of character c in pat
  */
-static void bm_make_delta1(int* delta1, const char* pat, size_t pat_len) {
+static void bm_make_delta1(int *delta1, const char *pat, size_t pat_len) {
     uint32_t i;
     for (i = 0; i < ALPHABET_LEN; i++) {
         delta1[i] = pat_len;
@@ -69,7 +69,7 @@ static void bm_make_delta1(int* delta1, const char* pat, size_t pat_len) {
 }
 
 /* Generate table of next possible full match from mismatch at pat[p] */
-static void bm_make_delta2(int* delta2, const char* pat, size_t pat_len) {
+static void bm_make_delta2(int *delta2, const char *pat, size_t pat_len) {
     int p;
     uint32_t last_prefix = pat_len - 1;
 
@@ -90,7 +90,7 @@ static void bm_make_delta2(int* delta2, const char* pat, size_t pat_len) {
     }
 }
 
-static char* bm_search(const char* str, size_t str_len, const char* pat, size_t pat_len) {
+static char *bm_search(const char *str, size_t str_len, const char *pat, size_t pat_len) {
     int delta1[ALPHABET_LEN];
     int delta2[pat_len];
     int i;
@@ -99,7 +99,7 @@ static char* bm_search(const char* str, size_t str_len, const char* pat, size_t 
     bm_make_delta2(delta2, pat, pat_len);
 
     if (pat_len == 0) {
-        return (char*)str;
+        return (char *)str;
     }
 
     i = pat_len - 1;
@@ -110,7 +110,7 @@ static char* bm_search(const char* str, size_t str_len, const char* pat, size_t 
             j--;
         }
         if (j < 0) {
-            return (char*)(str + i + 1);
+            return (char *)(str + i + 1);
         }
         i += MAX(delta1[(uint8_t)str[i]], delta2[j]);
     }
@@ -118,13 +118,13 @@ static char* bm_search(const char* str, size_t str_len, const char* pat, size_t 
     return NULL;
 }
 
-static int get_info(char* str, size_t len, char* lookup_str, size_t lookup_str_len,
-                    char* part_path) {
+static int get_info(char *str, size_t len, char *lookup_str, size_t lookup_str_len,
+                    char *part_path) {
     int ret = 0;
     int fd;
     off64_t size;
-    char* data = NULL;
-    char* offset = NULL;
+    char *data = NULL;
+    char *offset = NULL;
 
     fd = open(part_path, O_RDONLY);
     if (fd < 0) {
@@ -138,8 +138,8 @@ static int get_info(char* str, size_t len, char* lookup_str, size_t lookup_str_l
         goto err_fd_close;
     }
 
-    data = (char*)mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
-    if (data == (char*)-1) {
+    data = (char *)mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
+    if (data == (char *)-1) {
         ret = errno;
         goto err_fd_close;
     }
@@ -160,16 +160,15 @@ err_ret:
 }
 
 /* verify_trustzone("TZ_VERSION", "TZ_VERSION", ...) */
-Value* VerifyTrustZoneFn(const char* name, State* state,
-                     const std::vector<std::unique_ptr<Expr>>& argv) {
+Value *VerifyTrustZoneFn(const char *name, State *state,
+                         const std::vector<std::unique_ptr<Expr>> &argv) {
     char current_tz_version[TZ_VER_BUF_LEN];
     int ret;
 
-    ret = get_info(current_tz_version, TZ_VER_BUF_LEN, TZ_VER_STR, TZ_VER_STR_LEN,
-                   XBL_PART_PATH);
+    ret = get_info(current_tz_version, TZ_VER_BUF_LEN, TZ_VER_STR, TZ_VER_STR_LEN, XBL_PART_PATH);
     if (ret) {
-        return ErrorAbort(state, kFreadFailure,
-                          "%s() failed to read current TZ version: %d", name, ret);
+        return ErrorAbort(state, kFreadFailure, "%s() failed to read current TZ version: %d", name,
+                          ret);
     }
 
     std::vector<std::string> args;

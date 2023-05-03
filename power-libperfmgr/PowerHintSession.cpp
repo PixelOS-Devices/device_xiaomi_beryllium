@@ -63,11 +63,11 @@ static int64_t convertWorkDurationToBoostByPid(std::shared_ptr<AdpfConfig> adpfC
     int64_t targetDurationNanos = (int64_t)targetDuration.count();
     int64_t length = actualDurations.size();
     int64_t p_start =
-            samplingWindowP == 0 || samplingWindowP > length ? 0 : length - samplingWindowP;
+        samplingWindowP == 0 || samplingWindowP > length ? 0 : length - samplingWindowP;
     int64_t i_start =
-            samplingWindowI == 0 || samplingWindowI > length ? 0 : length - samplingWindowI;
+        samplingWindowI == 0 || samplingWindowI > length ? 0 : length - samplingWindowI;
     int64_t d_start =
-            samplingWindowD == 0 || samplingWindowD > length ? 0 : length - samplingWindowD;
+        samplingWindowD == 0 || samplingWindowD > length ? 0 : length - samplingWindowD;
     int64_t dt = ns_to_100us(targetDurationNanos);
     int64_t err_sum = 0;
     int64_t derivative_sum = 0;
@@ -96,8 +96,8 @@ static int64_t convertWorkDurationToBoostByPid(std::shared_ptr<AdpfConfig> adpfC
                                         err_sum / (length - p_start));
     int64_t iOut = static_cast<int64_t>(adpfConfig->mPidI * (*integral_error));
     int64_t dOut =
-            static_cast<int64_t>((derivative_sum > 0 ? adpfConfig->mPidDo : adpfConfig->mPidDu) *
-                                 derivative_sum / dt / (length - d_start));
+        static_cast<int64_t>((derivative_sum > 0 ? adpfConfig->mPidDo : adpfConfig->mPidDu) *
+                             derivative_sum / dt / (length - d_start));
 
     int64_t output = pOut + iOut + dOut;
     if (ATRACE_ENABLED()) {
@@ -121,8 +121,8 @@ static int64_t convertWorkDurationToBoostByPid(std::shared_ptr<AdpfConfig> adpfC
 
 }  // namespace
 
-PowerHintSession::PowerHintSession(int32_t tgid, int32_t uid, const std::vector<int32_t> &threadIds,
-                                   int64_t durationNanos) {
+PowerHintSession::PowerHintSession(int32_t tgid, int32_t uid,
+                                   const std::vector<int32_t> &threadIds, int64_t durationNanos) {
     mDescriptor = new AppHintDesc(tgid, uid, threadIds);
     mDescriptor->duration = std::chrono::nanoseconds(durationNanos);
     mStaleTimerHandler = sp<StaleTimerHandler>(new StaleTimerHandler(this));
@@ -130,9 +130,9 @@ PowerHintSession::PowerHintSession(int32_t tgid, int32_t uid, const std::vector<
     mPowerManagerHandler = PowerSessionManager::getInstance();
     mLastUpdatedTime.store(std::chrono::steady_clock::now());
     mLastStartedTimeNs =
-            std::chrono::duration_cast<std::chrono::nanoseconds>(
-                    (std::chrono::steady_clock::now() - mDescriptor->duration).time_since_epoch())
-                    .count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(
+            (std::chrono::steady_clock::now() - mDescriptor->duration).time_since_epoch())
+            .count();
     mLastDurationNs = durationNanos;
     mWorkPeriodNs = durationNanos;
 
@@ -285,7 +285,7 @@ ndk::ScopedAStatus PowerHintSession::updateTargetWorkDuration(int64_t targetDura
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
     targetDurationNanos =
-            targetDurationNanos * HintManager::GetInstance()->GetAdpfProfile()->mTargetTimeFactor;
+        targetDurationNanos * HintManager::GetInstance()->GetAdpfProfile()->mTargetTimeFactor;
     ALOGV("update target duration: %" PRId64 " ns", targetDurationNanos);
 
     mDescriptor->duration = std::chrono::nanoseconds(targetDurationNanos);
@@ -299,7 +299,7 @@ ndk::ScopedAStatus PowerHintSession::updateTargetWorkDuration(int64_t targetDura
 }
 
 ndk::ScopedAStatus PowerHintSession::reportActualWorkDuration(
-        const std::vector<WorkDuration> &actualDurations) {
+    const std::vector<WorkDuration> &actualDurations) {
     if (mSessionClosed) {
         ALOGE("Error: session is dead");
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
@@ -344,8 +344,8 @@ ndk::ScopedAStatus PowerHintSession::reportActualWorkDuration(
         return ndk::ScopedAStatus::ok();
     }
     int64_t output = convertWorkDurationToBoostByPid(
-            adpfConfig, mDescriptor->duration, actualDurations, &(mDescriptor->integral_error),
-            &(mDescriptor->previous_error), getIdString());
+        adpfConfig, mDescriptor->duration, actualDurations, &(mDescriptor->integral_error),
+        &(mDescriptor->previous_error), getIdString());
 
     /* apply to all the threads in the group */
     int next_min = std::min(static_cast<int>(adpfConfig->mUclampMinHigh),
@@ -363,7 +363,7 @@ ndk::ScopedAStatus PowerHintSession::reportActualWorkDuration(
 
 std::string AppHintDesc::toString() const {
     std::string out =
-            StringPrintf("session %" PRIxPTR "\n", reinterpret_cast<uintptr_t>(this) & 0xffff);
+        StringPrintf("session %" PRIxPTR "\n", reinterpret_cast<uintptr_t>(this) & 0xffff);
     const int64_t durationNanos = duration.count();
     out.append(StringPrintf("  duration: %" PRId64 " ns\n", durationNanos));
     out.append(StringPrintf("  uclamp.min: %d \n", current_min));
@@ -414,8 +414,8 @@ void PowerHintSession::wakeup() {
     if (mSessionClosed || !isActive() || !isTimeout())
         return;
     if (ATRACE_ENABLED()) {
-        std::string tag = StringPrintf("wakeup.%s(a:%d,s:%d)", getIdString().c_str(), isActive(),
-                                       isTimeout());
+        std::string tag =
+            StringPrintf("wakeup.%s(a:%d,s:%d)", getIdString().c_str(), isActive(), isTimeout());
         ATRACE_NAME(tag.c_str());
     }
     std::shared_ptr<AdpfConfig> adpfConfig = HintManager::GetInstance()->GetAdpfProfile();
@@ -457,25 +457,25 @@ void PowerHintSession::updateWorkPeriod(const std::vector<WorkDuration> &actualD
 time_point<steady_clock> PowerHintSession::getEarlyBoostTime() {
     std::shared_ptr<AdpfConfig> adpfConfig = HintManager::GetInstance()->GetAdpfProfile();
     int64_t earlyBoostTimeoutNs =
-            (int64_t)mDescriptor->duration.count() * adpfConfig->mEarlyBoostTimeFactor;
+        (int64_t)mDescriptor->duration.count() * adpfConfig->mEarlyBoostTimeFactor;
     time_point<steady_clock> nextStartTime =
-            mLastUpdatedTime.load() + nanoseconds(mWorkPeriodNs - mLastDurationNs);
+        mLastUpdatedTime.load() + nanoseconds(mWorkPeriodNs - mLastDurationNs);
     return nextStartTime + nanoseconds(earlyBoostTimeoutNs);
 }
 
 time_point<steady_clock> PowerHintSession::getStaleTime() {
     return mLastUpdatedTime.load() +
            nanoseconds(static_cast<int64_t>(
-                   mDescriptor->duration.count() *
-                   HintManager::GetInstance()->GetAdpfProfile()->mStaleTimeFactor));
+               mDescriptor->duration.count() *
+               HintManager::GetInstance()->GetAdpfProfile()->mStaleTimeFactor));
 }
 
 void PowerHintSession::StaleTimerHandler::updateTimer() {
     time_point<steady_clock> staleTime =
-            std::chrono::steady_clock::now() +
-            nanoseconds(static_cast<int64_t>(
-                    mSession->mDescriptor->duration.count() *
-                    HintManager::GetInstance()->GetAdpfProfile()->mStaleTimeFactor));
+        std::chrono::steady_clock::now() +
+        nanoseconds(
+            static_cast<int64_t>(mSession->mDescriptor->duration.count() *
+                                 HintManager::GetInstance()->GetAdpfProfile()->mStaleTimeFactor));
     updateTimer(staleTime);
 }
 
@@ -501,13 +501,13 @@ void PowerHintSession::StaleTimerHandler::handleMessage(const Message &) {
     }
     auto now = std::chrono::steady_clock::now();
     int64_t next =
-            static_cast<int64_t>(duration_cast<nanoseconds>(mStaleTime.load() - now).count());
+        static_cast<int64_t>(duration_cast<nanoseconds>(mStaleTime.load() - now).count());
     if (next > 0) {
         // Schedule for the stale timeout check.
         std::lock_guard<std::mutex> guard(mMessageLock);
         PowerHintMonitor::getInstance()->getLooper()->removeMessages(mSession->mStaleTimerHandler);
         PowerHintMonitor::getInstance()->getLooper()->sendMessageDelayed(
-                next, mSession->mStaleTimerHandler, NULL);
+            next, mSession->mStaleTimerHandler, NULL);
     } else {
         mSession->setStale();
         mIsMonitoring.store(false);
@@ -553,7 +553,7 @@ void PowerHintSession::EarlyBoostHandler::handleMessage(const Message &) {
     }
     auto now = std::chrono::steady_clock::now();
     int64_t next =
-            static_cast<int64_t>(duration_cast<nanoseconds>(mBoostTime.load() - now).count());
+        static_cast<int64_t>(duration_cast<nanoseconds>(mBoostTime.load() - now).count());
     if (next > 0) {
         if (ATRACE_ENABLED()) {
             const std::string idstr = mSession->getIdString();
@@ -563,7 +563,7 @@ void PowerHintSession::EarlyBoostHandler::handleMessage(const Message &) {
         std::lock_guard<std::mutex> guard(mMessageLock);
         PowerHintMonitor::getInstance()->getLooper()->removeMessages(mSession->mEarlyBoostHandler);
         PowerHintMonitor::getInstance()->getLooper()->sendMessageDelayed(
-                next, mSession->mEarlyBoostHandler, NULL);
+            next, mSession->mEarlyBoostHandler, NULL);
     } else {
         std::shared_ptr<AdpfConfig> adpfConfig = HintManager::GetInstance()->GetAdpfProfile();
         PowerSessionManager::getInstance()->setUclampMin(mSession, adpfConfig->mUclampMinHigh);
