@@ -43,6 +43,8 @@ TARGET_SCREEN_HEIGHT := 2246
 TARGET_SCREEN_WIDTH := 1080
 
 # Camera
+$(call inherit-product-if-exists, vendor/miuicamera/config.mk)
+
 PRODUCT_PACKAGES += \
     android.hardware.camera.provider@2.4-impl:32 \
     android.hardware.camera.provider@2.4-service \
