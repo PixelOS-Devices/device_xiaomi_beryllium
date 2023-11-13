@@ -104,9 +104,6 @@ persist.vendor.qcom.bluetooth.a2dp_offload_cap=sbc-aptx-aptxtws-aptxhd-aac-ldac
 ro.bluetooth.a2dp_offload.supported=true
 vendor.qcom.bluetooth.soc=cherokee
 
-# Charger
-ro.charger.enable_suspend=true
-
 # Chipset
 ro.soc.manufacturer=QTI
 ro.soc.model=SDM845
